@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-left">
+    <h1 class="display-4">Решение задачи линейного программирования симплекс методом</h1>
+    <p>Выберите количество переменных и количество строк (количество ограничений). </p>
+    <form method="post">
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label for="select1">Количество переменных</label>
+                <select class="form-control" id="select1" name="sel1">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label for="select2">Количество ограничений</label>
+                <select class="form-control" id="select2" name="sel2">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Далее</button>
+    </form>
+</div>
