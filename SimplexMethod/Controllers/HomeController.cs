@@ -45,14 +45,6 @@ namespace SimplexMethod.Controllers
             }
             return View();
         }
-        //[HttpPost]
-        //public IActionResult SimplexData(string[] items,string[] k, string[] f, int mode,int n,int m)
-        //{
-        //    SimplexDataViewModel model = new SimplexDataViewModel(items, k, f,mode,n , m);
-        //    model.Solve();
-        //    return PartialView("SimplexDataPartial",model);
-        //}
-
         [HttpPost]
         public IActionResult SimplexData(SimplexDataViewModel model)
         {

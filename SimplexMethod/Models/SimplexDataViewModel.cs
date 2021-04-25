@@ -18,10 +18,12 @@ namespace SimplexMethod.Models
         public int[] canonFunc;
         public bool NumberRepresent { get; set; }
         public List<string> k { get; set; }
-        public int N { get; set; }
-        public int M { get; set; }
-        public int type { get; set; }
-        int countOfExtraVar = 0; /*дополнительные переменные*/
+        public int N { get; set; } /*количество ограничений*/
+        public int M { get; set; } /*количество переменных ориг*/
+        public int Type { get; set; }
+        public int Mode { get; set; }  /*метод решения*/
+        public int countOfExtraVar = 0; /*дополнительные переменные*/
+        public int countofofArtificalvar = 0;
         int pivotRow = -1;
         int pivotCol = -1;
         public Tuple<int, string>[] Basis { get; set; }
@@ -30,60 +32,30 @@ namespace SimplexMethod.Models
         public enum Status { UNSOLVED, SOLVED, NO_SOLUTIONS, UNLIMITED };
         public Status status = Status.UNSOLVED;
         public List<Iteration> Iterations { get; set; }
-        //public SimplexDataViewModel(string[] items, string[] k, string[] originalF, int mode, int n, int m)
-        //{
-        //    originalLimits = new string[n, m + 2];
-        //    originalFunc = new string[m + 1];
-        //    int j, c = 0;
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        for (j = 0; j < m; j++)
-        //        {
-        //            originalLimits[i, j] = items[j + i * m];
-                    
-
-        //        }
-        //        originalLimits[i, j] = k[c];
-        //        originalLimits[i, j + 1] = k[c + 1];
-        //        c += 2;
-        //    }
-        //    for (int i = 0; i < m + 1; i++)
-        //    {
-        //        originalFunc[i] = originalF[i];
-        //    }
-        //    OriginalToCanon(mode);
-        //}
         public SimplexDataViewModel()
         {
             Iterations = new List<Iteration>();
         }
         private void OriginalToCanon(int mode)
         {
-            M += 2;
+            M += 1;
             int i = 0, j = 0;
             //количество дополнительных переменных
             for (i = 0; i < N; i++)
             {
-                if (originalLimits[i][M - 2] != "0")
+                if (originalLimits[i][M - 1] != "0")
                 {
                     countOfExtraVar++;
                 }
             }
 
 
-            canonLimits = new int[N, countOfExtraVar + M - 1];
-            canonFunc = new int[originalFunc.Count + countOfExtraVar];
-            Matrix = new Fraction[N + 1, countOfExtraVar + M - 1];
+            canonLimits = new int[N, countOfExtraVar + M];
+            canonFunc = new int[originalFunc.Count + countOfExtraVar];    
             Basis = new Tuple<int, string>[canonLimits.GetLength(0)];
-            for (i = 0; i < Matrix.GetLength(0); i++)
-            {
-                for (j = 0; j < Matrix.GetLength(1); j++)
-                    Matrix[i, j] = new Fraction(0);
-            }
             for (i = 0; i < originalFunc.Count - 1; i++)
             {
                 canonFunc[i] = int.Parse(originalFunc[i]) * mode;
-                Matrix[N, i] = new Fraction(int.Parse(originalFunc[i]) * mode);
             }
             canonFunc[canonFunc.Length - 1] = int.Parse(originalFunc[i]);
             int sign;
@@ -91,42 +63,32 @@ namespace SimplexMethod.Models
             for (i = 0; i < N; i++)
             {
                 sign = 1;
-                if (int.Parse(originalLimits[i][M - 1]) < 0)
+                if (int.Parse(originalLimits[i][M]) < 0)
                 {
-                    string k = originalLimits[i][M - 2];
+                    string k = originalLimits[i][M - 1];
                     if (k == "1")
-                        originalLimits[i][M - 2] = "-1";
+                        originalLimits[i][M - 1] = "-1";
                     if (k == "-1")
-                        originalLimits[i][M - 2] = "1";
+                        originalLimits[i][M - 1] = "1";
                     sign = -1;
                 }
-                for (j = 0; j < M - 2; j++)
+                for (j = 0; j < M - 1; j++)
                 {
-                    Matrix[i, j] = new Fraction(int.Parse(originalLimits[i][ j]) * sign);
                     canonLimits[i, j] = int.Parse(originalLimits[i][ j]) * sign;
                 }
                 canonLimits[i, canonLimits.GetLength(1) - 1] = int.Parse(originalLimits[i][j + 1]) * sign;
-                Matrix[i, canonLimits.GetLength(1) - 1] = new Fraction(int.Parse(originalLimits[i][j + 1]) * sign);
             }
             int c = 0;
 
             for (i = 0; i < canonLimits.GetLength(0); i++)
             {
-                int k = int.Parse(originalLimits[i][M - 2]);
+                int k = int.Parse(originalLimits[i][M - 1]);
                 if (k != 0)
                 {
-                    canonLimits[i, M - 2 + c] = k;
-                    Matrix[i, M - 2 + c] = new Fraction(k);
-                    //if (k < 0) {
-                    //    for (j = 0; j < canonLimits.GetLength(1); j++)
-                    //    {
-                    //        canonLimits[i, j] *= k;
-                    //        Matrix[i, j] *= k;
-                    //    }
-                    //}
+                    canonLimits[i, M - 1 + c] = k;
                     c++;
                     if (k == 1)
-                        Basis[i] = new Tuple<int, string>(M - 2 + c, $"X{M - 2 + c}");
+                        Basis[i] = new Tuple<int, string>(M - 1 + c, $"X{M - 1 + c}");
 
                 }
             }
@@ -144,6 +106,16 @@ namespace SimplexMethod.Models
                 {
                     if (canonLimits[i, j] != 0)
                     {
+                        if (canonLimits[i, j] == 1)
+                        {
+                            str.AppendFormat("+X{0}", j + 1);
+                            continue;
+                        }
+                        if(canonLimits[i, j] == -1)
+                        {
+                            str.AppendFormat("-X{0}", j + 1);
+                            continue;
+                        }
                         str.AppendFormat("{0:+#;-#;+0}X{1}", canonLimits[i, j], j + 1);
                     }
 
@@ -161,26 +133,38 @@ namespace SimplexMethod.Models
             str.AppendFormat("{0:#;-#;+0}X1", canonFunc[i]);
             for (i = 1; i < canonFunc.Length - 1; i++)
             {
-                if (i >= M- 2)
+                if (canonFunc[i] == 1)
                 {
-                    str.AppendFormat("{0:+#;-#;+0}U{1}", canonFunc[i], i + 1);
+                    str.AppendFormat("+X{0}", i + 1);
+                    continue;
                 }
-                else
-                    str.AppendFormat("{0:+#;-#;+0}X{1}", canonFunc[i], i + 1);
+                if (canonFunc[i] == -1)
+                {
+                    str.AppendFormat("-X{0}", i + 1);
+                    continue;
+                }
+                str.AppendFormat("{0:+#;-#;+0}X{1}", canonFunc[i], i + 1);
             }
             str.AppendFormat("{0:+#;-#;+0}", canonFunc[i]);
             str.AppendFormat("->min\n");
             return str.ToString();
         }
         public void Solve()
-        {
-            OriginalToCanon(type);
+        { 
+            OriginalToCanon(Type);
+            CreateMatrix();
+            if (Mode != 1)
+            {
+                SolveWithArtificialBasis();
+                return;
+            }
+           
             SearchBase();
-            Iterations.Add(new Iteration(Basis, Matrix,type));
-            while (CheckForUnsolvable()) ;
+            Iterations.Add(new Iteration(Basis, Matrix,Type));
+            while (CheckForUnsolvable());
             if (status == Status.NO_SOLUTIONS)
             {
-                Iterations.Add(new Iteration(Basis, Matrix,type));
+                Iterations.Add(new Iteration(Basis, Matrix,Type));
                 return;
             }
             ExprF();
@@ -188,7 +172,7 @@ namespace SimplexMethod.Models
             {
                 if (FindPivotRow())
                 {
-                    Iterations.Add(new Iteration(Basis, Matrix,type, pivotRow, pivotCol));
+                    Iterations.Add(new Iteration(Basis, Matrix,Type, pivotRow, pivotCol));
                     CalcBasis(pivotRow, pivotCol);
                     ExprF();
                 }
@@ -197,9 +181,90 @@ namespace SimplexMethod.Models
                     status = Status.UNLIMITED;
                 }
             }
-            Iterations.Add(new Iteration(Basis, Matrix,type));
+            Iterations.Add(new Iteration(Basis, Matrix,Type));
             status = Status.SOLVED;
 
+        }
+        public void SolveWithArtificialBasis()
+        {
+            AddArtificalvar();
+            Iterations.Add(new Iteration(Basis, Matrix, Type));
+            //while (CheckForUnsolvable()) ;
+            if (status == Status.NO_SOLUTIONS)
+            {
+                Iterations.Add(new Iteration(Basis, Matrix, Type));
+                return;
+            }
+            ExprFArtificBasis();
+            while (FindPivotCol())
+            {
+                if (FindPivotRow())
+                {
+                    Iterations.Add(new Iteration(Basis, Matrix, Type, pivotRow, pivotCol));
+                    CalcBasis(pivotRow, pivotCol);
+                    if (CheckArtificialVar())
+                    {
+                        ExprF();
+                    }
+                    else
+                    {
+                        ExprFArtificBasis();
+                    }
+                }
+                else
+                {
+                    status = Status.UNLIMITED;
+
+                }
+               
+            }
+            Iterations.Add(new Iteration(Basis, Matrix, Type));
+            status = Status.SOLVED;
+
+        }
+        private void CreateMatrix()
+        {
+            int k=0;
+            if (Mode == 1)
+            {
+                Matrix = new Fraction[N + 1, countOfExtraVar + M];
+            }
+            else
+            {
+                for (int i = 0; i < Basis.Length; i++)
+                    if (Basis[i] == null)
+                        k++;
+                Matrix = new Fraction[N + 1, countOfExtraVar + M + k];
+            }
+            for (int i = 0; i < Matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < Matrix.GetLength(1); j++)
+                    Matrix[i, j] = new Fraction(0);
+            }
+            for (int i = 0; i < originalFunc.Count - 1; i++)
+            {
+                Matrix[N, i] = new Fraction(int.Parse(originalFunc[i]) * Type);
+            }
+
+            for (int i  = 0; i < canonLimits.GetLength(0); i++)
+            {
+                for (int j = 0; j < canonLimits.GetLength(1)-1; j++)
+                {
+                    Matrix[i, j] = new Fraction(canonLimits[i, j]);
+                }
+                Matrix[i, Matrix.GetLength(1) - 1] = new Fraction(canonLimits[i, canonLimits.GetLength(1) - 1]);
+            }
+        }
+       private bool CheckArtificialVar()
+        {
+            for(int i = 0; i < Basis.Length; i++)
+            {
+                if (Basis[i] != null && Basis[i].Item2.First() == 'U')
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         private void SearchBase()
         {
@@ -210,15 +275,34 @@ namespace SimplexMethod.Models
                 {
                     if (!CheckRow(i))
                     {
-                        for (int j = 0; j < M - 2; j++)
+                        for (int j = 0; j < M - 1; j++)
                         {
-                            if (!IsBaseVariable(j + 1))
+                            if (!IsBaseVariable(j + 1)&&Matrix[i,j]!=0)
                             {
                                 CalcBasis(i, j);
                                 Basis[i] = new Tuple<int, string>(j + 1, $"X{j + 1}");
                                 break;
                             }
                         }
+                        //Basis[i] = new Tuple<int, string>(, "");
+                    }
+                }
+            }
+        }
+        private void AddArtificalvar()
+        {
+            for (int i = 0; i < Basis.Length; i++)
+            {
+                if (Basis[i] == null)
+                {
+                    if (!CheckRow(i))
+                    {
+                     
+                        Basis[i] = new Tuple<int, string>(M-1+countOfExtraVar+countofofArtificalvar, $"U{countofofArtificalvar+1}");
+                        countofofArtificalvar++;
+                        Matrix[i, M-2+countOfExtraVar+ countofofArtificalvar] = new Fraction(1);
+                       
+
                     }
                 }
             }
@@ -251,7 +335,7 @@ namespace SimplexMethod.Models
         {
             for (int j = 0; j < Matrix.GetLength(1) - 1; j++)
             {
-                if (Matrix[row, j] != 0 && CheckNull(row, j)) /*Matrix?*/
+                if (Matrix[row, j] == 1 && CheckNull(row, j)) 
                 {
                     CalcBasis(row, j);
                     Basis[row] = new Tuple<int, string>(j + 1, $"X{j + 1}");
@@ -313,7 +397,7 @@ namespace SimplexMethod.Models
                         result = true;
                     }
                     else
-                        if (Matrix[row, i] < 0 && Matrix[row, i] < Matrix[row, col])             /*где то ошибка неправльно выбирает максимальный минус*//* ищет первый отрицательный?*/
+                        if (Matrix[row, i] < 0 && Matrix[row, i] < Matrix[row, col])        
                     {
                         col = i;
                       
@@ -334,32 +418,59 @@ namespace SimplexMethod.Models
 
         private void ExprF()
         {
+            for (int i = 0; i < canonLimits.GetLength(1)-1; i++)
+            {      
+                Matrix[Matrix.GetLength(0) - 1, i] = new Fraction(0);
+                for (int j = 0; j < Matrix.GetLength(0) - 1; j++)
+                {
+                    if(Basis[j]!=null)
+                    Matrix[Matrix.GetLength(0) - 1, i] += canonFunc[Basis[j].Item1 - 1] * Matrix[j, i];
+                }
+                Matrix[Matrix.GetLength(0) - 1, i] = canonFunc[i] - Matrix[Matrix.GetLength(0) - 1, i];
+            }
+            Matrix[Matrix.GetLength(0) - 1, Matrix.GetLength(1)-1] = new Fraction(0);
+            for (int j = 0; j < Matrix.GetLength(0) - 1; j++)
+            {
+                if (Basis[j] != null)
+                    Matrix[Matrix.GetLength(0) - 1, Matrix.GetLength(1) - 1] += canonFunc[Basis[j].Item1 - 1] * Matrix[j, Matrix.GetLength(1) - 1];
+            }
+            Matrix[Matrix.GetLength(0) - 1, Matrix.GetLength(1) - 1]  = canonFunc[canonFunc.Length-1] - Matrix[Matrix.GetLength(0) - 1, Matrix.GetLength(1) - 1];
+        }
+        private void ExprFArtificBasis()
+        {
             for (int i = 0; i < Matrix.GetLength(1); i++)
             {
                 Matrix[Matrix.GetLength(0) - 1, i] = new Fraction(0);
                 for (int j = 0; j < Matrix.GetLength(0) - 1; j++)
                 {
-                    Matrix[Matrix.GetLength(0) - 1, i] += canonFunc[Basis[j].Item1 - 1] * Matrix[j, i];
+                    if (Basis[j] != null && Basis[j].Item2.First()=='U' )
+                    {
+                        Matrix[Matrix.GetLength(0) - 1, i] += Matrix[j, i];
+                    }
                 }
-                Matrix[Matrix.GetLength(0) - 1, i] = canonFunc[i] - Matrix[Matrix.GetLength(0) - 1, i];
+                Matrix[Matrix.GetLength(0) - 1, i] = -Matrix[Matrix.GetLength(0) - 1, i];
             }
         }
         private bool FindPivotCol()
         {
+            pivotCol = -1;
             bool result = false;
-            Fraction max = new Fraction(0);
-            for (int i = 0; i < Matrix.GetLength(1)-1; i++)
+            for (int i = 0; i < canonLimits.GetLength(1)-1; i++)
             {
-                if (Matrix[Matrix.GetLength(0) - 1,i] < 0)
+                
+                if (Matrix[Matrix.GetLength(0) - 1, i] < 0 && pivotCol == -1)
                 {
-
-                    if (-Matrix[Matrix.GetLength(0) - 1,i] > max)
-                    {
-                        max = -Matrix[Matrix.GetLength(0) - 1, i];
+                    pivotCol = i;
+                    result = true;
+                }
+                else
+                {
+                    if (Matrix[Matrix.GetLength(0) - 1, i] < 0 && Matrix[Matrix.GetLength(0) - 1, i]<Matrix[Matrix.GetLength(0) - 1,pivotCol])
+                    {              
                         pivotCol = i;
-                        result = true;
                     }
                 }
+                
 
             }
             return result;

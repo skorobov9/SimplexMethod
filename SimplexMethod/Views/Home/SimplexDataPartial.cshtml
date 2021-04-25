@@ -22,10 +22,15 @@
                     <th style="width: 6%"  scope="col" >@k</th>
                     @{ k++;
                     }
-                    @for (i = 1; i < iteration.Matrix.GetLength(1); i++)
+                    @for (i = 1; i < Model.canonLimits.GetLength(1); i++)
                     {
                         <th style="width: 6%" scope="col" >X<sub>@i</sub></th>
                     }
+                   @for (i = 1; i <= Model.countofofArtificalvar; i++) 
+                   { 
+                <th style="width: 6%" scope="col">U<sub>@i</sub></th>
+                   }
+
                     <th style="width: 6%">B</th>
                 </tr>
 
@@ -34,9 +39,17 @@
 
                 @for (i = 0; i < iteration.Matrix.GetLength(0) - 1; i++)
                 {
-                <tr>
-                    <th scope="row">@iteration.Basis[i].Item2</th>
 
+
+<tr>
+                    @if (iteration.Basis[i] != null)
+                    {
+                    <th scope="row">@iteration.Basis[i].Item2</th>
+                    }
+                    else
+                    {
+                        <th scope="row">?</th>
+                    }
                     @for (var j = 0; j < iteration.Matrix.GetLength(1); j++)
                     {
                         if (i == iteration.pivotRow && j == iteration.pivotCol)
@@ -64,6 +77,7 @@
 
 
                     }
+                    
 
                 </tr>
                 }

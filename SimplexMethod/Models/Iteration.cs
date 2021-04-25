@@ -26,8 +26,11 @@ namespace SimplexMethod.Models
                 AllVariables[i] = new Fraction(0);
             for(int i=0;i<Matrix.GetLength(0)-1;i++)
             {
-                int k = Basis[i].Item1-1;
-                AllVariables[k] = Matrix[i, Matrix.GetLength(1) - 1];
+                if (Basis[i] != null)
+                {
+                    int k = Basis[i].Item1 - 1;
+                    AllVariables[k] = Matrix[i, Matrix.GetLength(1) - 1];
+                }
             }
             if(type==1)
             F = -Matrix[Matrix.GetLength(0) - 1, Matrix.GetLength(1) - 1];

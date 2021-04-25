@@ -24,7 +24,7 @@
                             @for (j = 0; j < @ViewBag.Sel1; j++)
                             {
 
-                                <td> <input type="text" style="width:75px" class="form-control" pattern="^-?[0-9]+$" required value="0" asp-for="originalLimits[i][j]"></td>
+                                <td> <input type="text" style="width:75px" class="form-control" required value="0" asp-for="originalLimits[i][j]"></td>
                             }
                             <td>
                                 <select id="s" asp-for="originalLimits[i][j]">
@@ -33,13 +33,13 @@
                                     <option value="1">≤</option>
                                 </select>
                             </td>
-                            <td> <input type="text" style="width:75px" class="form-control" pattern="^-?[0-9]+$" required value="0" asp-for="originalLimits[i][j+1]"></td>
+                            <td> <input type="text" style="width:75px" class="form-control" required value="0" asp-for="originalLimits[i][j+1]"></td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-        
+
         <div class="form-group">
             <p class="">Функция F(x)</p>
             <table class="table-borderless">
@@ -59,12 +59,12 @@
                     <tr>
                         @for (j = 0; j <= @ViewBag.Sel1; j++)
                         {
-                            <td> <input type="text" style="width:75px" class="form-control" pattern="^-?[0-9]+$" required value="0" asp-for="originalFunc[j]"></td>
+                            <td> <input type="text" style="width:75px" class="form-control" required value="0" asp-for="originalFunc[j]"></td>
                         }
 
                         <td>—></td>
                         <td>
-                            <select id="mode" asp-for="type">
+                            <select id="mode" asp-for="Type">
                                 <option value="1">min</option>
                                 <option value="-1">max</option>
                             </select>
@@ -76,6 +76,16 @@
         <div class="form-group custom-control custom-switch">
             <input type="checkbox" class="custom-control-input" id="customSwitch1" asp-for="NumberRepresent">
             <label class="custom-control-label" for="customSwitch1">Использовать дроби</label>
+
+        </div> 
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label for="select2">Метод решения</label>
+                <select class="form-control" id="select2" asp-for="Mode">
+                    <option value="1">Симплекс-метод</option>
+                    <option value="2">Метод искусственного базиса</option>
+                </select>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Далее</button>
         <input type="hidden" asp-for="N" value="@ViewBag.Sel2" />
