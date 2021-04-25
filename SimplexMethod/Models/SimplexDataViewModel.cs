@@ -101,7 +101,7 @@ namespace SimplexMethod.Models
             for (int i = 0; i < canonLimits.GetLength(0); i++)
             {
                 j = 0;
-                str.AppendFormat("{0:#;-#;+0}X1", canonLimits[i, j]);
+                str.AppendFormat("{0:#;-#;0}X1", canonLimits[i, j]);
                 for (j = 1; j < canonLimits.GetLength(1) - 1; j++)
                 {
                     if (canonLimits[i, j] != 0)
@@ -120,7 +120,7 @@ namespace SimplexMethod.Models
                     }
 
                 }
-                str.AppendFormat("={0:#;-#;+0}", canonLimits[i, j]);
+                str.AppendFormat("={0:#;-#;0}", canonLimits[i, j]);
                 str.AppendFormat("\n");
             }
             return str.ToString();
@@ -130,7 +130,7 @@ namespace SimplexMethod.Models
             M += 2;
             StringBuilder str = new StringBuilder();
             int i = 0;
-            str.AppendFormat("{0:#;-#;+0}X1", canonFunc[i]);
+            str.AppendFormat("{0:#;-#;0}X1", canonFunc[i]);
             for (i = 1; i < canonFunc.Length - 1; i++)
             {
                 if (canonFunc[i] == 1)
@@ -179,6 +179,7 @@ namespace SimplexMethod.Models
                 else
                 {
                     status = Status.UNLIMITED;
+                    return;
                 }
             }
             Iterations.Add(new Iteration(Basis, Matrix,Type));
@@ -214,6 +215,7 @@ namespace SimplexMethod.Models
                 else
                 {
                     status = Status.UNLIMITED;
+                    return;
 
                 }
                
@@ -494,7 +496,6 @@ namespace SimplexMethod.Models
             }
             return result;
         }
-
 
     }
 }
