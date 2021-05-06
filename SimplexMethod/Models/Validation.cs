@@ -17,6 +17,7 @@ namespace SimplexMethod.Models
         }
         public bool CheckValues(object value)
         {
+            bool result = false;
            if( value is List<List<string>>)
             {
                 List<List<string>> tmp = (List<List<string>>)value;
@@ -26,13 +27,14 @@ namespace SimplexMethod.Models
                     {
                         if (!int.TryParse(item[i], out int res))
                         {
-                            ErrorMessage = " Вводите только числа!";
+                            ErrorMessage = "Вводите только числа!";
                             return false;
                         }
                         if (item[i] != "0")
-                            return true;
+                            result = true;
                     }
                 }
+                return result;
             }
            if(value is List<string>)
             {
@@ -42,13 +44,14 @@ namespace SimplexMethod.Models
                 {
                     if (!int.TryParse(item, out int res))
                     {
-                        ErrorMessage = " Вводите только числа!";
+                        ErrorMessage = "Вводите только числа!";
                         return false;
                     }
                         
                     if (item != "0")
-                            return true;
+                        result= true;
                 }
+                return result;
             }
             return false;
         }

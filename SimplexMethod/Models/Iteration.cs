@@ -8,14 +8,13 @@ namespace SimplexMethod.Models
 {
     public class Iteration
     {
-        public Tuple<int, string>[] Basis { get; set; }
+        public Tuple<int, string>[] Basis { get; set; } 
         public Fraction[] AllVariables { get; set; }
         public Fraction[,] Matrix { get; set; } /*симплекс таблица*/
-        public int pivotRow;
+        public int pivotRow;  
         public int pivotCol;
-        public string str;
         public Fraction F;
-        public Iteration(Tuple<int,string>[] basis,Fraction[,] matrix,int type, int pivotRow=-1, int pivotCol=-1)
+        public Iteration(Tuple<int,string>[] basis,Fraction[,] matrix,int type, int pivotRow=-1, int pivotCol=-1,string str="")
         {
             this.Basis = (Tuple<int, string>[])basis.Clone();
             this.Matrix =(Fraction[,]) matrix.Clone();
@@ -44,6 +43,17 @@ namespace SimplexMethod.Models
             for ( i = 0; i < AllVariables.Length-1; i++)
                 str.Append($"{AllVariables[i]},");
             str.Append($"{AllVariables[i]})");
+            return str.ToString();
+
+        }
+        public string AllVarAsDouble()
+        {
+            StringBuilder str = new StringBuilder();
+            str.Append("(");
+            int i;
+            for (i = 0; i < AllVariables.Length - 1; i++)
+                str.Append($"{AllVariables[i].AsRoundDouble},");
+            str.Append($"{AllVariables[i].AsRoundDouble})");
             return str.ToString();
 
         }

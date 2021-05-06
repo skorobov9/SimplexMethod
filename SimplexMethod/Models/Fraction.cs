@@ -52,11 +52,6 @@ namespace SimplexMethod.Models
             r.Reduce();
             return r;
         }
-        // Возвращает дробь, обратную данной
-        private Fraction GetReverse()
-        {
-            return new Fraction(this.denominator , this.numerator);
-        }
         // Возвращает дробь с противоположным знаком
         private Fraction GetWithChangedSign()
         {
@@ -134,9 +129,6 @@ namespace SimplexMethod.Models
         }
 
         // Метод сравнения двух дробей
-        // Возвращает	 0, если дроби равны
-        //				 1, если this больше that
-        //				-1, если this меньше that
         private int CompareTo(Fraction that)
         {
             if (this.Equals(that))
@@ -151,7 +143,6 @@ namespace SimplexMethod.Models
             }
             return -1;
         }
-        // Мой метод Equals
         public bool Equals(Fraction that)
         {
          
@@ -179,7 +170,7 @@ namespace SimplexMethod.Models
         // Перегрузка оператора ">" для двух дробей
         public static bool operator >(Fraction a, Fraction b)
         {
-            return a.CompareTo(b) > 0;
+            return a.AsDouble >b.AsDouble;
         }
         // Перегрузка оператора ">" для дроби и числа
         public static bool operator >(Fraction a, double b)
@@ -225,16 +216,10 @@ namespace SimplexMethod.Models
             }
             return result + Math.Abs(this.numerator) + "/" + Math.Abs( this.denominator);
         }
+
         // Перегрузка оператора "Равенство" для двух дробей
         public static bool operator ==(Fraction a, Fraction b)
         {
-            // Приведение к Object необходимо для того, чтобы
-            // можно было сравнивать дроби с null.
-            // Обычное сравнение a.Equals(b) в данном случае не подходит,
-            // так как если a есть null, то у него нет метода Equals,
-            // следовательно будет выдано исключение, а если
-            // b окажется равным null, то исключение будет вызвано в
-            // методе this.Equals
             Object aAsObj = a as Object;
             Object bAsObj = b as Object;
             if (aAsObj == null || bAsObj == null)
@@ -268,6 +253,7 @@ namespace SimplexMethod.Models
         {
             return new Fraction(a) != b;
         }
+
         public double AsDouble
         {
             get =>  1.0 * this.numerator / this.denominator;

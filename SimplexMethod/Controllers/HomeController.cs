@@ -28,6 +28,7 @@ namespace SimplexMethod.Controllers
         {
             TempData["Sel1"] = sel1;
             TempData["Sel2"] = sel2;
+         
             return  RedirectToAction("SimplexData");
         }
         [HttpGet]
@@ -36,7 +37,9 @@ namespace SimplexMethod.Controllers
             if (TempData["Sel1"] != null && TempData["Sel2"] != null)
             {
                 ViewBag.Sel1 = TempData["Sel1"];
-                ViewBag.Sel2 = TempData["Sel2"];
+                ViewBag.Sel2 = TempData["Sel2"];   
+                TempData.Keep("Sel1");
+                TempData.Keep("Sel2");
             }
             else
             {

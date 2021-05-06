@@ -2,46 +2,49 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @model SimplexDataViewModel
-<div id="searchresults" class="bd-callout bd-callout-warning ">
-    Исходная функция в канонической форме
-    <p style="white-space:pre-line">
+<div id="searchresults" class="bd-callout bd-callout-warning" >
+    <p class="text-info">Исходная задача в канонической форме</p>
+    <p style="white-space:pre-line; overflow-x:auto">
         @Model.PrintCanonF()
         @Model.PrintCanonLimits()
     </p>
     @{
-        int i;
-        int k = 0; 
+        int i,j;
+        int k = 0;
         Iteration literation = Model.Iterations.Last();
 
     }
 
     @foreach (var iteration in Model.Iterations)
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th style="width: 6%" scope="col">Итерация @k</th>
-                    @{ k++;
-                    }
-                    @for (i = 1; i < Model.canonLimits.GetLength(1); i++)
+        <div class="table-responsive-md" style="overflow-x:auto">
+            <table class="table w-auto">
+                <thead>
+                    <tr>
+                        <th scope="col">Итерация @k</th>
+                        @{ k++;
+                        }
+                  
+                        @for (i = 1; i < Model.canonLimits.GetLength(1); i++)
+                        {
+                            <th scope="col">X<sub>@i</sub></th>
+                        }
+                        @for (j = 1; j <= Model.СountofArtificalvar; j++)
+                        {
+                            if (iteration.IsBaseVariable(i++))
+                            {
+                            <th scope="col">U<sub>@j</sub></th>
+                            }
+                        }
+
+                        <th>B</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+
+                    @for (i = 0; i < iteration.Matrix.GetLength(0) - 1; i++)
                     {
-                        <th style="width: 6%" scope="col">X<sub>@i</sub></th>
-                    }
-                    @for (i = 1; i <= Model.countofofArtificalvar; i++)
-                    {
-                        <th style="width: 6%" scope="col">U<sub>@i</sub></th>
-                    }
-
-                    <th style="width: 6%">B</th>
-                </tr>
-
-            </thead>
-            <tbody>
-
-                @for (i = 0; i < iteration.Matrix.GetLength(0) - 1; i++)
-                {
-
-
                     <tr>
                         @if (iteration.Basis[i] != null)
                         {
@@ -51,78 +54,124 @@
                         {
                             <th scope="row">?</th>
                         }
-                        @for (var j = 0; j < iteration.Matrix.GetLength(1); j++)
+                        @for (j = 0; j < iteration.Matrix.GetLength(1) - 1; j++)
                         {
-
-                            if (i == iteration.pivotRow && j == iteration.pivotCol)
+                            if (!(!iteration.IsBaseVariable(j + 1) && j + 1 > Model.canonLimits.GetLength(1) - 1))
                             {
-                                if (Model.NumberRepresent)
+
+                                if (i == iteration.pivotRow && j == iteration.pivotCol)
                                 {
-                                    <td style="background-color:cyan;">@iteration.Matrix[i, j] </td>
+                                    if (Model.NumberRepresent)
+                                    {
+                                        <td style="background-color:cyan;">@iteration.Matrix[i, j] </td>
+                                    }
+                                    else
+                                    {
+                                        <td style="background-color:cyan;">@iteration.Matrix[i, j].AsRoundDouble </td>
+                                    }
                                 }
                                 else
                                 {
-                                    <td style="background-color:cyan;">@iteration.Matrix[i, j].AsRoundDouble </td>
+                                    if (Model.NumberRepresent)
+                                    {
+                                        <td>@iteration.Matrix[i, j] </td>
+                                    }
+                                    else
+                                    {
+                                        <td>@iteration.Matrix[i, j].AsRoundDouble </td>
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if (Model.NumberRepresent)
-                                {
-                                    <td>@iteration.Matrix[i, j] </td>
-                                }
-                                else
-                                {
-                                    <td>@iteration.Matrix[i, j].AsRoundDouble </td>
-                                }
-                            }
 
 
+                            }
                         }
-
-
-                    </tr>
-                }
-
-                <tr>
-                    <th scope="row">F</th>
-                    @for (var j = 0; j < iteration.Matrix.GetLength(1); j++)
-                    {
-
-                        if (Model.NumberRepresent)
+                        @if (Model.NumberRepresent)
                         {
-                            <td>@iteration.Matrix[i, j] </td>
+                        <td>@iteration.Matrix[i, j] </td>
                         }
                         else
                         {
-                            <td>@iteration.Matrix[i, j].AsRoundDouble </td>
+                        <td>@iteration.Matrix[i, j].AsRoundDouble </td>
+                        }
+
+                    </tr>
+                    }
+
+                <tr>
+                    <th scope="row">F</th>
+                    @for (j = 0; j < iteration.Matrix.GetLength(1) - 1; j++)
+                    {
+                        if (!(!iteration.IsBaseVariable(j + 1) && j + 1 > Model.canonLimits.GetLength(1) - 1))
+                        {
+                            if (Model.NumberRepresent)
+                            {
+                                <td>@iteration.Matrix[i, j] </td>
+                            }
+                            else
+                            {
+                                <td>@iteration.Matrix[i, j].AsRoundDouble </td>
+                            }
                         }
                     }
-                </tr>
-            </tbody>
-        </table>
+                    @if (Model.NumberRepresent)
+                    {
+                    <td>@iteration.Matrix[i, j] </td>
+                    }
+                    else
+                    {
+                    <td>@iteration.Matrix[i, j].AsRoundDouble </td>
+                    }
 
-        <p>Опорный план: @iteration.AllVar() F=@iteration.F</p>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        if (Model.NumberRepresent)
+        {
+            <p>Опорный план: @iteration.AllVar() F=@iteration.F</p>
+        }
+        else
+        {
+            <p>Опорный план: @iteration.AllVarAsDouble() F=@iteration.F.AsRoundDouble</p>
+        }
     }
     @if (Model.status == SimplexDataViewModel.Status.SOLVED)
     {
 
-       <p>
-            Ответ:
-            @for (i = 0; i < Model.canonLimits.GetLength(1)-1; i++)
-            {
-            <p>x<sub>@(i+1)</sub>=@literation.AllVariables[i]</p>
+        if (Model.NumberRepresent)
+        {
+            <div>
 
-             }
-            <p>F=@literation.F</p>
-        </p>
-     }
+                Ответ:
+                @for (i = 0; i < Model.M-1; i++)
+                {
+                <p>x<sub>@(i + 1)</sub>=@literation.AllVariables[i]</p>
+
+                }
+                <p>F=@literation.F</p>
+            </div>
+          }
+          else
+            {
+                <div>
+
+                    Ответ:
+                    @for (i = 0; i < Model.M-1; i++)
+                    {
+                    <p>x<sub>@(i + 1)</sub>=@literation.AllVariables[i].AsRoundDouble</p>
+
+                }
+                    <p>F=@literation.F.AsRoundDouble</p>
+                </div>
+                }
+            }
     @if (Model.status == SimplexDataViewModel.Status.NO_SOLUTIONS)
     {
         <p>Нет решений</p>
     }
     @if (Model.status == SimplexDataViewModel.Status.UNLIMITED)
     {
-      <p>Функция не ограничена. Оптимальное решение отсутствует.</p>
+        <p>Функция не ограничена. Оптимальное решение отсутствует.</p>
     }
 </div>

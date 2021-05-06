@@ -2,11 +2,11 @@
 @{
     int j;
 }
-<div class="text-left">
-    <h1 class="display-4">Решение задачи линейного программирования симплекс методом</h1>
+<div >
+
     <form method="post" data-ajax="true" data-ajax-mode="replace" data-ajax-update="#results">
         <div class="form-group">
-            <table class="table-borderless">
+            <table class="table-borderless table-responsive-md">
                 <thead>
                     <tr>
                         @for (var i = 1; i <= @ViewBag.Sel1; i++)
@@ -24,16 +24,16 @@
                             @for (j = 0; j < @ViewBag.Sel1; j++)
                             {
 
-                                <td> <input type="text" style="width:75px" class="form-control" required value="0" asp-for="originalLimits[i][j]"></td>
+                                <td> <input type="text" style="width:75px" class="form-control"  value="0" asp-for="OriginalLimits[i][j]"></td>
                             }
                             <td>
-                                <select id="s" asp-for="originalLimits[i][j]">
+                                <select id="s" asp-for="OriginalLimits[i][j]">
                                     <option value="-1">≥</option>
                                     <option value="0">=</option>
                                     <option value="1">≤</option>
                                 </select>
                             </td>
-                            <td> <input type="text" style="width:75px" class="form-control" required value="0" asp-for="originalLimits[i][j+1]"></td>
+                            <td> <input type="text" style="width:75px" class="form-control"  value="0" asp-for="OriginalLimits[i][j+1]"></td>
                         </tr>
                     }
                 </tbody>
@@ -42,7 +42,7 @@
 
         <div class="form-group">
             <p class="">Функция F(x)</p>
-            <table class="table-borderless">
+            <table class="table-borderless table-responsive-md">
                 <thead>
                     <tr>
                         @for (var i = 1; i <= @ViewBag.Sel1; i++)
@@ -59,7 +59,7 @@
                     <tr>
                         @for (j = 0; j <= @ViewBag.Sel1; j++)
                         {
-                            <td> <input type="text" style="width:75px" class="form-control" required value="0" asp-for="originalFunc[j]"></td>
+                            <td> <input type="text" style="width:75px" class="form-control"  value="0" asp-for="OriginalFunc[j]"></td>
                         }
 
                         <td>—></td>
@@ -79,7 +79,7 @@
 
         </div> 
         <div class="form-row">
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-4">
                 <label for="select2">Метод решения</label>
                 <select class="form-control" id="select2" asp-for="Mode">
                     <option value="1">Симплекс-метод</option>
