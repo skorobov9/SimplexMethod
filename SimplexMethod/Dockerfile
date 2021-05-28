@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["SimplexMethod/SimplexMethod.csproj", "SimplexMethod/"]
-RUN dotnet restore "SimplexMethod/SimplexMethod.csproj"
+COPY ["SimplexMethod.csproj", "SimplexMethod.csproj"]
+RUN dotnet restore "SimplexMethod.csproj"
 COPY . .
-WORKDIR "/src/SimplexMethod"
+WORKDIR "/src"
 RUN dotnet build "SimplexMethod.csproj" -c Release -o /app/build
 
 FROM build AS publish
